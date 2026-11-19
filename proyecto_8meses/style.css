@@ -1,0 +1,716 @@
+body {
+  background-color: #12100e;
+  color: #e8dcc5;
+  font-family: serif;
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* AVISO PARA GIRAR EL TELÉFONO EN MÓVILES */
+@media screen and (orientation: portrait) {
+  body::before {
+    content: "⚠️ Por favor, gira tu teléfono en horizontal para vivir la experiencia completa.";
+    position: fixed;
+    inset: 0;
+    background: #0d0b0a;
+    color: #c8a96e;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+    font-size: 1.2rem;
+    font-family: serif;
+  }
+}
+
+/* BARRA SUPERIOR */
+.top-hud {
+  background: #0d0b0a;
+  border-bottom: 1px solid #3a2e25;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 40;
+}
+
+/* HABITACIÓN CON TAMAÑO FIJO Y EQUILIBRADO */
+.room-container {
+  position: relative;
+  width: 100vw;
+  flex: 1;
+  background: 
+    radial-gradient(circle at 50% 40%, rgba(58, 46, 37, 0.4) 0%, rgba(12, 10, 8, 0.95) 85%),
+    repeating-linear-gradient(90deg, #1c1613 0px, #1c1613 38px, #16110e 39px, #16110e 40px);
+  box-shadow: inset 0 0 90px #000;
+  overflow: hidden;
+}
+
+/* Suelo de madera y rodapié */
+.room-container::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55px;
+  background: repeating-linear-gradient(0deg, #221812 0px, #221812 12px, #140e0a 13px, #140e0a 14px);
+  border-top: 8px solid #36261c; /* Rodapié */
+  box-shadow: 0 -5px 15px rgba(0,0,0,0.7);
+  z-index: 1;
+}
+
+/* OBJETOS INTERACTIVOS */
+.room-object {
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.25s ease, filter 0.25s ease;
+  z-index: 5;
+}
+
+.room-object:hover {
+  transform: scale(1.03);
+  filter: drop-shadow(0 0 12px rgba(200, 169, 110, 0.45));
+}
+
+.obj-label {
+  position: absolute;
+  bottom: -26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  color: #c8a96e;
+  background: rgba(13, 11, 10, 0.9);
+  border: 1px solid #4a3728;
+  padding: 2px 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+  z-index: 20;
+}
+
+.room-object:hover .obj-label {
+  opacity: 1;
+}
+
+/* =========================================
+   1. VENTANA CON LLUVIA Y MARCO DE MADERA
+   ========================================= */
+/* 1. Ventana (Más arriba, separada del suelo y del escritorio) */
+.obj-window {
+  top: 8%;
+  left: 8%;
+  width: 130px;
+  height: 195px;
+  background: #2b1e16;
+  padding: 8px;
+  border: 3px solid #4a3728;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8), inset 0 0 10px #000;
+}
+
+.window-glass {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, #091118 0%, #132230 100%);
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.9);
+}
+
+/* Barrotes en cruz */
+.window-cross-v {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #36261c;
+  transform: translateX(-50%);
+  box-shadow: 2px 0 4px rgba(0,0,0,0.6);
+}
+.window-cross-h {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: #36261c;
+  transform: translateY(-50%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+/* Repisa inferior */
+.window-sill {
+  position: absolute;
+  bottom: -10px;
+  left: -8px;
+  right: -8px;
+  height: 10px;
+  background: #4a3728;
+  border-bottom: 3px solid #231914;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.7);
+}
+
+/* Haz de luz diagonal entrando por la ventana al tronar */
+.window-light-beam {
+  position: absolute;
+  top: 8%;
+  left: 8%;
+  width: 340px;
+  height: 92%;
+  background: linear-gradient(135deg, rgba(205, 230, 255, 0.28) 0%, rgba(205, 230, 255, 0.05) 55%, transparent 100%);
+  clip-path: polygon(0 0, 38% 0, 100% 100%, 15% 100%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.window-light-beam.strike {
+  animation: lightningAnim 0.6s ease-out;
+}
+
+/* Gotas de lluvia cayendo */
+/* Destello de relámpago en el cristal */
+.lightning-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(210, 235, 255, 0.85);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lightning-flash.strike {
+  animation: lightningAnim 0.6s ease-out;
+}
+
+@keyframes lightningAnim {
+  0% { opacity: 0.9; }
+  20% { opacity: 0.1; }
+  35% { opacity: 0.8; }
+  100% { opacity: 0; }
+}
+
+/* Gotas de lluvia cayendo */
+.rain-drop {
+  position: absolute;
+  width: 1.5px;
+  height: 16px;
+  background: rgba(174, 206, 232, 0.45);
+  top: -20px;
+  animation: rainFall linear infinite;
+  z-index: 1;
+}
+
+@keyframes rainFall {
+  to { transform: translateY(220px); }
+}
+
+/* =========================================
+   2. CUADRO CON PASPARTÚ Y MARCO DORADO
+   ========================================= */
+/* 2. Cuadro (Alineado estéticamente entre la ventana y el reloj) */
+.obj-frame {
+  top: 10%;
+  left: 32%;
+  width: 112px;
+  height: 142px;
+  background: linear-gradient(135deg, #6e5239, #3b2a1d);
+  padding: 7px;
+  border: 3px solid #c8a96e;
+  box-shadow: 0 12px 20px rgba(0,0,0,0.85), inset 0 0 6px #000;
+}
+
+.frame-mat {
+  width: 100%;
+  height: 100%;
+  background: #d8cbb3; /* Paspartú beige vintage */
+  padding: 6px;
+  box-sizing: border-box;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.6);
+}
+
+.frame-mat img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: sepia(0.25) contrast(1.05);
+  border: 1px solid #4a3728;
+}
+
+/* =========================================
+   3. RELOJ DE PÉNDULO ANTIGUO
+   ========================================= */
+.obj-clock {
+  top: 11%;
+  right: 29%;
+  width: 90px;
+  height: 245px;
+  background: linear-gradient(90deg, #241a14, #36271e, #241a14);
+  border: 4px solid #4a3728;
+  border-radius: 40px 40px 4px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 16px;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.9);
+}
+
+.clock-face {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f2e8d5 60%, #c4b293 100%);
+  border: 3px solid #c8a96e;
+  color: #12100e;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+}
+
+.clock-hand {
+  position: absolute;
+  width: 2px;
+  height: 18px;
+  background: #8c2d2d;
+  top: 8px;
+  left: 50%;
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(35deg);
+}
+
+.clock-hand-minute {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 2.5px;
+  height: 36%;
+  background: #2b1d14;
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(0deg); /* Apunta a las 12 */
+  border-radius: 2px;
+}
+
+.clock-hand-hour {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 3.5px;
+  height: 25%;
+  background: #7a2323;
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(210deg); /* Apunta a las 7 */
+  border-radius: 2px;
+}
+
+.clock-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  background: #c8a96e;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.clock-body {
+  margin-top: 14px;
+  width: 52px;
+  height: 130px;
+  background: #120d0a;
+  border: 2px solid #4a3728;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.pendulum-rod {
+  width: 2px;
+  height: 95px;
+  background: #c8a96e;
+  transform-origin: top center;
+  animation: swingPendulum 2.2s ease-in-out infinite alternate;
+  position: relative;
+}
+
+.pendulum-bob {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #f5df9d, #9e7b36);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+@keyframes swingPendulum {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+
+/* =========================================
+   4. ESCRITORIO CON CAJONES Y VELA
+   ========================================= */
+/* 4. Escritorio (Más grande y con mayor presencia debajo del cuadro) */
+.obj-desk {
+  bottom: 25px;
+  left: 26%;      /* Centrado visualmente bajo el cuadro */
+  width: 270px;   /* Antes 220px */
+  height: 125px;  /* Antes 95px */
+  background: #2c2019;
+  border-top: 8px solid #543d2c;
+  border-left: 4px solid #3d2c20;
+  border-right: 4px solid #3d2c20;
+  box-shadow: 0 12px 25px rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.desk-surface {
+  position: absolute;
+  top: -22px;
+  left: 35px;
+  background: #e8dcc5;
+  color: #12100e;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: 1px solid #4a3728;
+  transform: rotate(-4deg);
+  box-shadow: 2px 4px 8px rgba(0,0,0,0.6);
+}
+
+/* Vela encendida sobre el escritorio */
+.desk-candle {
+  position: absolute;
+  top: -28px;
+  right: 25px;
+  width: 12px;
+  height: 22px;
+  background: linear-gradient(90deg, #d9cbb8, #f5efe6);
+  border-bottom: 3px solid #c8a96e;
+  border-radius: 2px 2px 0 0;
+}
+
+.candle-flame {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7px;
+  height: 11px;
+  background: radial-gradient(circle, #fff 20%, #ffae00 70%, transparent 100%);
+  border-radius: 50% 50% 20% 20%;
+  box-shadow: 0 0 12px #ff9900, 0 0 20px rgba(255, 153, 0, 0.5);
+  animation: flicker 0.15s infinite alternate;
+}
+
+@keyframes flicker {
+  from { transform: translateX(-50%) scale(0.95); opacity: 0.9; }
+  to { transform: translateX(-50%) scale(1.08); opacity: 1; }
+}
+
+.desk-drawers {
+  display: flex;
+  gap: 8px;
+  height: 100%;
+}
+
+.drawer {
+  flex: 1;
+  background: #211712;
+  border: 2px solid #4a3728;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.knob {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #c8a96e;
+  box-shadow: 0 2px 3px #000;
+}
+
+/* =========================================
+  5. PUERTA TALLADA CON POMO Y CANDADO
+   ========================================= */
+.obj-door {
+  bottom: 35px; /* Apoyada sobre el suelo */
+  right: 9%;
+  width: 150px;
+  height: 290px;
+  background: #3d2b1f;
+  padding: 8px 8px 0 8px;
+  border: 3px solid #241912;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+  box-sizing: border-box;
+}
+
+.door-leaf {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #261b14, #302219, #261b14);
+  border: 2px solid #1a120d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 14px;
+  box-sizing: border-box;
+}
+
+.door-molding {
+  width: 100%;
+  height: 75px;
+  border: 3px solid #4a3728;
+  background: #211712;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.door-lock-plate {
+  background: #120e0b;
+  border: 2px solid #c8a96e;
+  padding: 5px 10px;
+  font-size: 1.1rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.8);
+}
+
+.door-knob {
+  position: absolute;
+  right: 12px;
+  top: 52%;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #f5dfa8, #8c6a2b);
+  box-shadow: 0 2px 4px #000;
+}
+
+/* PANTALLAS Y MODALES */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 7, 0.95);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+.overlay.active {
+  display: flex;
+}
+.intro-box {
+  background: #1b1613;
+  border: 2px solid #c8a96e;
+  padding: 40px;
+  text-align: center;
+}
+.btn-vintage {
+  background: #4a3728;
+  color: #e8dcc5;
+  border: 1px solid #c8a96e;
+  padding: 10px 20px;
+  cursor: pointer;
+  margin-top: 15px;
+  font-weight: bold;
+}
+.btn-vintage:hover {
+  background: #c8a96e;
+  color: #12100e;
+}
+
+/* ESTILOS MINIJUEGO LAPSE */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 8, 7, 0.92);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+.modal.active {
+  display: flex;
+}
+.lapse-box {
+  background: #1b1613;
+  border: 2px solid #c8a96e;
+  padding: 15px 25px; /* Reducimos el padding superior e inferior */
+  width: 360px;
+  max-height: 90vh;   /* Evita que sea más grande que la pantalla */
+  overflow-y: auto;   /* Permite deslizar si la pantalla es muy pequeña */
+  text-align: center;
+  box-shadow: 0 0 30px #000;
+  box-sizing: border-box;
+}
+.happiness-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+.progress-bg {
+  flex: 1;
+  height: 10px;
+  background: #0d0b0a;
+  border: 1px solid #c8a96e;
+  margin: 0 10px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+#happiness-fill {
+  height: 100%;
+  background: #c84b4b;
+  width: 45%;
+  transition: width 0.3s ease;
+}
+.lapse-card {
+  background: #e8dcc5;
+  color: #12100e;
+  padding: 15px 10px; /* Reducimos un poco el relleno interno */
+  border-radius: 6px;
+  min-height: 110px;  /* Reducimos la altura mínima para que encaje perfecto */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  margin-bottom: 12px;
+}
+.lapse-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+.btn-choice {
+  width: 100px;
+  padding: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  font-family: serif;
+}
+.btn-choice.no {
+  background: #5c2323;
+  color: #fff;
+}
+.btn-choice.yes {
+  background: #2d5c3b;
+  color: #fff;
+}
+.digit-input {
+  width: 40px;
+  height: 50px;
+  text-align: center;
+  font-size: 1.5rem;
+  background: #0d0b0a;
+  color: #c8a96e;
+  border: 1px solid #c8a96e;
+  font-family: serif;
+}
+
+/* DIÁLOGOS FLOTANTES INFERIORES */
+.dialog-box {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: rgba(18, 14, 12, 0.95);
+  border: 2px solid #c8a96e;
+  color: #e8dcc5;
+  padding: 12px 25px;
+  font-family: serif;
+  font-size: 0.95rem;
+  text-align: center;
+  z-index: 100;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+  max-width: 80%;
+}
+
+.dialog-box.active {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* AJUSTE FINO PARA MÓVILES EN HORIZONTAL (COMO IPHONE 11) */
+@media screen and (max-height: 450px) and (orientation: landscape) {
+  .top-hud {
+    padding: 5px 15px;
+    font-size: 0.8rem;
+  }
+
+  .obj-window {
+    top: 6%;
+    width: 100px;
+    height: 145px;
+  }
+
+  .window-light-beam {
+    top: 6%;
+    width: 260px;
+  }
+
+  .obj-frame {
+    top: 8%;
+    width: 88px;
+    height: 112px;
+  }
+
+  .obj-clock {
+    top: 6%;
+    width: 72px;
+    height: 185px;
+  }
+
+  .clock-body {
+    height: 90px;
+  }
+
+  .pendulum-rod {
+    height: 65px;
+  }
+
+  .obj-desk {
+    bottom: 20px;
+    left: 26%;
+    width: 215px;  /* Antes 175px */
+    height: 98px;  /* Antes 75px */
+  }
+
+  .obj-door {
+    bottom: 20px;
+    width: 115px;
+    height: 215px;
+  }
+
+  /* Ajuste para que la carta final y el candado quepan sin cortar */
+  .lapse-box {
+    padding: 12px 18px;
+    max-height: 88vh;
+  }
+}

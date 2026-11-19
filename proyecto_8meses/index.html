@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paradox: Capítulo 08</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- PANTALLA DE INICIO -->
+  <div id="intro-screen" class="overlay active">
+    <div class="intro-box">
+      <h1>PARADOX: CAPÍTULO 08</h1>
+      <p>Nuestra aventura interactiva de los 8 meses.</p>
+      <button id="btn-start" class="btn-vintage">ENTRAR A LA HABITACIÓN</button>
+    </div>
+  </div>
+
+  <!-- HUD SUPERIOR (PISTAS Y AUDIO) -->
+  <header class="top-hud">
+    <div>
+      <span>CLAVES ENCONTRADAS:</span>
+      <span id="clue-display" style="color: #c8a96e; font-weight: bold;">? ? ?</span>
+    </div>
+    <button id="btn-audio" class="btn-vintage" style="margin-top:0; padding: 4px 10px; font-size: 0.75rem;">🔊 Sonido: ON</button>
+  </header>
+
+  <!-- HABITACIÓN INTERACTIVA DETALLADA -->
+  <main class="room-container">
+
+    <!-- Ventana con lluvia y relámpagos -->
+    <div class="room-object obj-window" id="obj-window">
+      <div class="window-glass" id="window-glass">
+        <div class="lightning-flash" id="lightning-flash"></div>
+        <div class="window-cross-v"></div>
+        <div class="window-cross-h"></div>
+      </div>
+      <div class="window-sill"></div>
+      <span class="obj-label">Ventana</span>
+    </div>
+
+    <div class="window-light-beam" id="window-light-beam"></div>
+
+    <!-- Cuadro / Retrato con marco tallado -->
+    <div class="room-object obj-frame" id="obj-frame">
+      <div class="frame-mat">
+        <img src="foto.jpg" alt="Nosotros" />
+      </div>
+      <span class="obj-label">Retrato</span>
+    </div>
+
+    <!-- Reloj con manecillas marcando las 7:00 -->
+    <div class="room-object obj-clock" id="obj-clock">
+      <div class="clock-face">
+        <div class="clock-hand-minute"></div>
+        <div class="clock-hand-hour"></div>
+        <div class="clock-center"></div>
+      </div>
+      <div class="clock-pendulum-window">
+        <div class="pendulum-rod">
+          <div class="pendulum-bob"></div>
+        </div>
+      </div>
+      <span class="obj-label">Reloj</span>
+    </div>
+
+    <!-- Escritorio de madera con vela y cartas -->
+    <div class="room-object obj-desk" id="obj-desk">
+      <div class="desk-candle">
+        <div class="candle-flame"></div>
+      </div>
+      <div class="desk-surface">🃏 Cartas</div>
+      <div class="desk-drawers">
+        <div class="drawer"><span class="knob"></span></div>
+        <div class="drawer"><span class="knob"></span></div>
+      </div>
+      <span class="obj-label">Escritorio</span>
+    </div>
+
+    <!-- Puerta Final con paneles y pomo -->
+    <div class="room-object obj-door" id="obj-door">
+      <div class="door-arch"></div>
+      <div class="door-leaf">
+        <div class="door-molding top"></div>
+        <div class="door-lock-plate">🔒</div>
+        <div class="door-knob"></div>
+        <div class="door-molding bottom"></div>
+      </div>
+      <span class="obj-label">Puerta</span>
+    </div>
+
+  </main>
+
+  <!-- MODAL DEL MINIJUEGO ESTILO LAPSE -->
+  <div id="lapse-modal" class="modal">
+    <div class="lapse-box">
+      <h3>CARTAS DEL DESTINO</h3>
+      <p style="font-size: 0.85rem; margin-bottom: 15px; color: #a89f91;">
+        Sube la Felicidad al 100% tomando decisiones correctas.
+      </p>
+
+      <div class="happiness-container">
+        <span>FELICIDAD ❤️:</span>
+        <div class="progress-bg">
+          <div id="happiness-fill" style="width: 50%;"></div>
+        </div>
+        <span id="happiness-val">50%</span>
+      </div>
+
+      <div class="lapse-card" id="lapse-card">
+        <div id="card-emoji" style="font-size: 2.5rem; margin-bottom: 10px;">🎮</div>
+        <p id="card-text">¿Jugamos una última partida en línea aunque ya sea madrugada?</p>
+      </div>
+
+      <div class="lapse-buttons">
+        <button id="btn-no" class="btn-choice no">NO</button>
+        <button id="btn-yes" class="btn-choice yes">SÍ</button>
+      </div>
+
+      <button class="btn-vintage" id="close-lapse" style="margin-top: 15px; font-size: 0.8rem;">Cerrar escritorio</button>
+    </div>
+  </div>
+
+  <!-- MODAL DEL CANDADO NUMÉRICO -->
+  <div id="lock-modal" class="modal">
+    <div class="lapse-box" style="width: 400px;">
+      <h3>CERRADURA DE LA MEMORIA</h3>
+      <p style="font-size: 0.85rem; margin-bottom: 15px; color: #a89f91;">
+        Introduce la combinación de 6 dígitos encontrada en la habitación (DD-MM-AA):
+      </p>
+
+      <div style="display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: 20px;">
+        <input type="text" maxlength="1" class="digit-input" data-idx="0">
+        <input type="text" maxlength="1" class="digit-input" data-idx="1">
+        <span style="color: #c8a96e; font-weight: bold;">-</span>
+        <input type="text" maxlength="1" class="digit-input" data-idx="2">
+        <input type="text" maxlength="1" class="digit-input" data-idx="3">
+        <span style="color: #c8a96e; font-weight: bold;">-</span>
+        <input type="text" maxlength="1" class="digit-input" data-idx="4">
+        <input type="text" maxlength="1" class="digit-input" data-idx="5">
+      </div>
+
+      <p id="lock-error" style="color: #c45c5c; font-size: 0.85rem; margin-bottom: 10px; min-height: 20px;"></p>
+
+      <div style="display: flex; gap: 10px; justify-content: center;">
+        <button id="btn-unlock" class="btn-vintage" style="margin-top:0;">ABRIR PUERTA</button>
+        <button class="btn-vintage" id="close-lock" style="margin-top:0; background: #2c211b;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANTALLA FINAL: PUERTA ABIERTA Y CARTA -->
+  <div id="ending-screen" class="overlay">
+    <div id="ending-content" class="lapse-box" style="width: 480px; text-align: center;">
+      <h3 style="color: #c8a96e; font-size: 1.5rem; margin-bottom: 15px;">¡La puerta se ha abierto!</h3>
+      <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; color: #e8dcc5;">
+        Al otro lado estoy yo esperándote con algo muy especial que escribí para ti por nuestros 8 meses.
+      </p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button class="btn-vintage btn-gift" style="margin-top:0;">🎁 Recibir regalo</button>
+        <button class="btn-vintage btn-gift" style="margin-top:0;">💝 Recibir regalo</button>
+      </div>
+    </div>
+
+    <!-- EL PERGAMINO DE LA CARTA -->
+    <div id="letter-box" class="lapse-box" style="display: none; width: 550px; text-align: left; background: #e8dcc5; color: #12100e; border: 4px double #4a3728;">
+      <h3 id="letter-title" style="color: #8c2d2d; text-align: center; font-size: 1.4rem; margin-bottom: 15px;">Felices 8 Meses, mi amor</h3>
+      <div id="letter-body-content" style="font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">
+        <!-- Se llena dinámicamente desde script.js -->
+      </div>
+      <p id="letter-signature" style="text-align: right; font-style: italic; font-weight: bold; color: #4a3728;">Con todo mi amor, Tu novio</p>
+    </div>
+  </div>
+
+  <div id="dialog-box" class="dialog-box">
+    <p id="dialog-text"></p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
